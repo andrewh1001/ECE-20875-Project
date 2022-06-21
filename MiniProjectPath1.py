@@ -1,8 +1,7 @@
 import pandas
 import matplotlib.pyplot as plt
 from datetime import datetime 
-import matplotlib.dates as mdates
-from matplotlib.dates import AutoDateLocator, AutoDateFormatter, date2num
+from matplotlib.dates import AutoDateLocator, AutoDateFormatter
 import numpy as np
 ''' 
 The following is the starting code for path1 for data reading to make your first step easier.
