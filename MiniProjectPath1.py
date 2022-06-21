@@ -32,8 +32,8 @@ grid = plt.GridSpec(2,2)
 
 #Temperature
 plt.subplot(grid[0,:])
-plt.plot(date,highTemp, label = 'Highest Temperature')
-plt.plot(date,lowTemp, label = 'Lowest Temperature')
+plt.plot(date,highTemp, label = 'Highest Temperature', color = 'r')
+plt.plot(date,lowTemp, label = 'Lowest Temperature', color = 'b')
 ax = plt.gca()
 plt.ylim([20, 100])
 ax.set_yticks([20, 40, 60, 80, 100])
