@@ -1,3 +1,4 @@
+from matplotlib import gridspec
 import pandas
 import matplotlib.pyplot as plt
 from datetime import datetime 
@@ -15,14 +16,23 @@ dataset_1['Williamsburg Bridge']  = pandas.to_numeric(dataset_1['Williamsburg Br
 dataset_1['Williamsburg Bridge']  = pandas.to_numeric(dataset_1['Williamsburg Bridge'].replace(',','', regex=True))
 #dataset_1['Date'].apply(lambda x: datetime.strptime(x, '%d/%m/%Y')) 
 # print(dataset_1.to_string()) #This line will print out your data
+
 date = dataset_1["Date"] + '-2016'
 date = pandas.to_datetime(date)
 highTemp = dataset_1['High Temp']
 lowTemp = dataset_1['Low Temp']
+precipt = dataset_1['Precipitation']
 brookBrd = dataset_1['Brooklyn Bridge']
+manBrd = dataset_1['Manhattan Bridge']
+queenBrd = dataset_1['Queensboro Bridge']
+williamsBrd = dataset_1['Williamsburg Bridge']
 
 plt.figure(1)
-fig = plt.plot(date,highTemp)
+grid = plt.GridSpec(2,2)
+
+#Highest Temperature
+plt.subplot(grid[0,0])
+plt.plot(date,highTemp)
 ax = plt.gca()
 plt.xticks(rotation=90)
 locator = AutoDateLocator()
@@ -30,10 +40,12 @@ ax.xaxis.set_major_locator(locator)
 ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
 plt.xlabel('Time')
 plt.ylabel('Highest Temperature (Celcius)')
+ax.set_title('Highest Temperature in One Day')
 plt.grid()
 
-plt.figure(2)
-fig = plt.plot(date,lowTemp)
+#Lowest Temperature
+plt.subplot(grid[0,1])
+plt.plot(date,lowTemp)
 ax = plt.gca()
 plt.xticks(rotation=90)
 locator = AutoDateLocator()
@@ -41,17 +53,92 @@ ax.xaxis.set_major_locator(locator)
 ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
 plt.xlabel('Time')
 plt.ylabel('Lowest Temperature (Celcius)')
+ax.set_title('Lowest Temperature in One Day')
 plt.grid()
 
-plt.figure(3)
-fig = plt.plot(date,brookBrd)
+#Precipitation
+plt.subplot(grid[1,:])
+plt.plot(date,precipt)
 ax = plt.gca()
 plt.xticks(rotation=90)
 locator = AutoDateLocator()
 ax.xaxis.set_major_locator(locator)
 ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
 plt.xlabel('Time')
-plt.ylabel('Bike Usage')
+plt.ylabel('Precipitation (in)')
+ax.set_title('Rain Drop Height')
 plt.grid()
+
+#Subplot Config
+plt.suptitle('Temperature and Precipitation', fontsize  = 'xx-large')
+plt.tight_layout()
+
+#Bridges Bike Usage Graph
+plt.figure(2)
+grid = plt.GridSpec(2,2)
+
+#Brooklyn Bridge
+plt.subplot(grid[0,0])
+plt.plot(date,brookBrd)
+ax = plt.gca()
+plt.ylim([0, 10000])
+ax.set_yticks([0, 2500, 5000, 7500, 10000])
+plt.xticks(rotation=90)
+locator = AutoDateLocator()
+ax.xaxis.set_major_locator(locator)
+ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
+plt.xlabel('Time')
+plt.ylabel('Bike Usage')
+ax.set_title('Brooklyn Bridge')
+plt.grid()
+
+#Manhattan Bridge
+plt.subplot(grid[0,1])
+plt.plot(date,manBrd)
+ax = plt.gca()
+plt.ylim([0, 10000])
+ax.set_yticks([0, 2500, 5000, 7500, 10000])
+plt.xticks(rotation=90)
+locator = AutoDateLocator()
+ax.xaxis.set_major_locator(locator)
+ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
+plt.xlabel('Time')
+plt.ylabel('Bike Usage')
+ax.set_title('Manhattan Bridge')
+plt.grid()
+
+#Queensboro Bridge
+plt.subplot(grid[1,0])
+plt.plot(date,queenBrd)
+ax = plt.gca()
+plt.ylim([0, 10000])
+ax.set_yticks([0, 2500, 5000, 7500, 10000])
+plt.xticks(rotation=90)
+locator = AutoDateLocator()
+ax.xaxis.set_major_locator(locator)
+ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
+plt.xlabel('Time')
+plt.ylabel('Bike Usage')
+ax.set_title('Queensboro Bridge')
+plt.grid()
+
+#Williamsburg Bridge
+plt.subplot(grid[1,1])
+plt.plot(date,williamsBrd)
+ax = plt.gca()
+plt.ylim([0, 10000])
+ax.set_yticks([0, 2500, 5000, 7500, 10000])
+plt.xticks(rotation=90)
+locator = AutoDateLocator()
+ax.xaxis.set_major_locator(locator)
+ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
+plt.xlabel('Time')
+plt.ylabel('Bike Usage')
+ax.set_title('Williamsburg Bridge')
+plt.grid()
+
+#Subplot Config
+plt.suptitle('New York City Bridges Bike Usage', fontsize  = 'xx-large')
+plt.tight_layout()
 
 plt.show()
