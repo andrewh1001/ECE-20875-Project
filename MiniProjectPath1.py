@@ -10,4 +10,5 @@ dataset_1['Manhattan Bridge']     = pandas.to_numeric(dataset_1['Manhattan Bridg
 dataset_1['Queensboro Bridge']    = pandas.to_numeric(dataset_1['Queensboro Bridge'].replace(',','', regex=True))
 dataset_1['Williamsburg Bridge']  = pandas.to_numeric(dataset_1['Williamsburg Bridge'].replace(',','', regex=True))
 dataset_1['Williamsburg Bridge']  = pandas.to_numeric(dataset_1['Williamsburg Bridge'].replace(',','', regex=True))
-# print(dataset_1.to_string()) #This line will print out your data
+print(dataset_1) #This line will print out your data
+
