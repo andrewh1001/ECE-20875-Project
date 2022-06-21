@@ -30,9 +30,10 @@ williamsBrd = dataset_1['Williamsburg Bridge']
 plt.figure(1)
 grid = plt.GridSpec(2,2)
 
-#Highest Temperature
-plt.subplot(grid[0,0])
-plt.plot(date,highTemp)
+#Temperature
+plt.subplot(grid[0,:])
+plt.plot(date,highTemp, label = 'Highest Temperature')
+plt.plot(date,lowTemp, label = 'Lowest Temperature')
 ax = plt.gca()
 plt.ylim([20, 100])
 ax.set_yticks([20, 40, 60, 80, 100])
@@ -41,24 +42,10 @@ locator = AutoDateLocator()
 ax.xaxis.set_major_locator(locator)
 ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
 plt.xlabel('Time')
-plt.ylabel('Highest Temperature (Fahrenheit)')
-ax.set_title('Highest Temperature in One Day')
+plt.ylabel('Temperature (Fahrenheit)')
+ax.set_title('Highest and Lowest Temperature in One Day')
 plt.grid()
-
-#Lowest Temperature
-plt.subplot(grid[0,1])
-plt.plot(date,lowTemp)
-ax = plt.gca()
-plt.ylim([20, 100])
-ax.set_yticks([20, 40, 60, 80, 100])
-plt.xticks(rotation=90)
-locator = AutoDateLocator()
-ax.xaxis.set_major_locator(locator)
-ax.xaxis.set_major_formatter(AutoDateFormatter(locator) )
-plt.xlabel('Time')
-plt.ylabel('Lowest Temperature (Fahrenheit)')
-ax.set_title('Lowest Temperature in One Day')
-plt.grid()
+plt.legend(fontsize = 'small')
 
 #Precipitation
 plt.subplot(grid[1,:])
