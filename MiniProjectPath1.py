@@ -8,6 +8,19 @@ import numpy as np
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_validate
+
+def PolyCoefficients(x, coeffs):
+    o = len(coeffs)
+    print(f'# This is a polynomial of order {o}.')
+    y = 0
+    for i in range(o):
+        y += coeffs[i]*x**i
+    return y
 
 ''' 
 The following is the starting code for path1 for data reading to make your first step easier.
@@ -34,7 +47,10 @@ williamsBrd = dataset_1['Williamsburg Bridge']
 total = brookBrd + manBrd + williamsBrd + queenBrd
 avgTemp = (highTemp + lowTemp) / 2
 independent = dataset_1[['High Temp', 'Low Temp', 'Precipitation']]
-
+independentAvg = [avgTemp, precipt]
+independentAvg = np.array(independentAvg).T
+#print(np.shape(independentAvg))
+'''
 plt.figure(1)
 grid = plt.GridSpec(2,2)
 
@@ -141,8 +157,8 @@ plt.suptitle('New York City Bridges Bike Usage', fontsize  = 'xx-large')
 plt.tight_layout()
 
 plt.show()
-
-#Standard Deviation Calculation
+'''
+'''
 X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = 0)
 regr = linear_model.LinearRegression()
 regr.fit(X_train, y_train)
@@ -159,6 +175,7 @@ print(r2_train)
 print('Score: ', score)
 print('Accuracy: ' + str(score*100) + '%')
 
+#normalize data
 X_train_mean = np.mean(X_train, axis = 0)
 X_train_std = np.std(X_train, axis = 0)
 y_mean = np.mean(total)
@@ -182,4 +199,43 @@ r2_train = r2_score(y_normalize, y_pred_train)
 print(r2_train)
 print('Score: ', score)
 print('Accuracy: ' + str(score*100) + '%')
+'''
+
+X_train, X_test, y_train, y_test = train_test_split(independentAvg, total, test_size = 0.3, random_state = 0)
+r2 = []
+colors = ['gold', 'yellow', 'red', 'blue', 'purple', 'pink', 'black', 'orange']
+polynomial_degree = [1,2,3,4,5,6,7,8]
+#print(np.shape(X_train))
+#print(np.shape(y_train))
+
+regr = make_pipeline(PolynomialFeatures(8), StandardScaler(), Ridge())
+regr.fit(X_train, y_train)
+y_pred_train = regr.predict(X_train)
+print(np.shape(X_train))
+print(np.shape(y_pred_train))
+'''
+for index, num in enumerate(polynomial_degree):
+    regr = make_pipeline(PolynomialFeatures(num), StandardScaler(), Ridge())
+    regr.fit(X_train, y_train)
+    y_pred_train = regr.predict(X_train)
+    y_pred_test = regr.predict(X_test)
+    MSE_train = mean_squared_error(y_train, y_pred_train)
+    MSE_test = mean_squared_error(y_test, y_pred_test)
+    r2_train = r2_score(y_train, y_pred_train)
+    r2.append(r2_train)
+
+for i in range(len(r2)):
+  print('Polynomial Degree ' + str(i+1) + ' r2: ' + str(r2[i]))
+'''
+
+fig = plt.figure(figsize=(12, 4))
+ax1 = fig.add_subplot(131, projection='3d')
+ax2 = fig.add_subplot(132, projection='3d')
+ax3 = fig.add_subplot(133, projection='3d')
+axes = [ax1, ax2, ax3]
+for ax in axes:
+    ax.plot(avgTemp, precipt, total, marker = 'o', linestyle='none')
+    ax.plot(X_train[:,0], X_train[:,1], y_pred_train)
+
+plt.show()
 
