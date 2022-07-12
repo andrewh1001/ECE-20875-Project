@@ -1,9 +1,14 @@
+from audioop import avg
 from matplotlib import gridspec
 import pandas
 import matplotlib.pyplot as plt
 from datetime import datetime 
 from matplotlib.dates import AutoDateLocator, AutoDateFormatter
 import numpy as np
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+
 ''' 
 The following is the starting code for path1 for data reading to make your first step easier.
 'dataset_1' is the clean data for path1.
@@ -26,6 +31,9 @@ brookBrd = dataset_1['Brooklyn Bridge']
 manBrd = dataset_1['Manhattan Bridge']
 queenBrd = dataset_1['Queensboro Bridge']
 williamsBrd = dataset_1['Williamsburg Bridge']
+total = brookBrd + manBrd + williamsBrd + queenBrd
+avgTemp = (highTemp + lowTemp) / 2
+independent = dataset_1[['High Temp', 'Low Temp', 'Precipitation']]
 
 plt.figure(1)
 grid = plt.GridSpec(2,2)
@@ -133,3 +141,45 @@ plt.suptitle('New York City Bridges Bike Usage', fontsize  = 'xx-large')
 plt.tight_layout()
 
 plt.show()
+
+#Standard Deviation Calculation
+X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = 0)
+regr = linear_model.LinearRegression()
+regr.fit(X_train, y_train)
+y_pred_train = regr.predict(X_train)
+y_pred_test = regr.predict(X_test)
+intercept = regr.intercept_
+coefficient = regr.coef_
+score = regr.score(X_test, y_test)
+MSE_train = mean_squared_error(y_train, y_pred_train)
+MSE_test = mean_squared_error(y_test, y_pred_test)
+r2_train = r2_score(y_train, y_pred_train)
+
+print(r2_train)
+print('Score: ', score)
+print('Accuracy: ' + str(score*100) + '%')
+
+X_train_mean = np.mean(X_train, axis = 0)
+X_train_std = np.std(X_train, axis = 0)
+y_mean = np.mean(total)
+y_std = np.std(total)
+X_train_normalize = (X_train - X_train_mean) / X_train_std
+y_normalize = (y_train - y_mean) / y_std
+regr.fit(X_train_normalize, y_normalize)
+
+X_test_normalize = (X_test - X_train_mean) / X_train_std
+y_test_normalize = (y_test - y_mean) / y_std
+
+y_pred_train = regr.predict(X_train_normalize)
+y_pred_test = regr.predict(X_test_normalize)
+intercept = regr.intercept_
+coefficient = regr.coef_
+score = regr.score(X_test_normalize, y_test_normalize)
+MSE_train = mean_squared_error(y_normalize, y_pred_train)
+MSE_test = mean_squared_error(y_test_normalize, y_pred_test)
+r2_train = r2_score(y_normalize, y_pred_train)
+
+print(r2_train)
+print('Score: ', score)
+print('Accuracy: ' + str(score*100) + '%')
+
