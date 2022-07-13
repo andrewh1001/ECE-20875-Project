@@ -201,20 +201,30 @@ print('Score: ', score)
 print('Accuracy: ' + str(score*100) + '%')
 '''
 
-X_train, X_test, y_train, y_test = train_test_split(independentAvg, total, test_size = 0.3, random_state = 0)
+X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = None)
+
+'''
 r2 = []
 colors = ['gold', 'yellow', 'red', 'blue', 'purple', 'pink', 'black', 'orange']
-polynomial_degree = [1,2,3,4,5,6,7,8]
-#print(np.shape(X_train))
-#print(np.shape(y_train))
-
-regr = make_pipeline(PolynomialFeatures(8), StandardScaler(), Ridge())
-regr.fit(X_train, y_train)
-y_pred_train = regr.predict(X_train)
+degree = [1,2,3,4,5,6,7,8]
 print(np.shape(X_train))
-print(np.shape(y_pred_train))
+print(np.shape(y_train))
 '''
-for index, num in enumerate(polynomial_degree):
+
+#regr = make_pipeline(PolynomialFeatures(8), StandardScaler(), Ridge())
+scaled_X_train = StandardScaler().fit_transform(X_train)
+scaled_X_test = StandardScaler().fit_transform(X_test)
+regr = Ridge(alpha = 0.5)
+regr.fit(scaled_X_train, y_train)
+y_pred_test = regr.predict(scaled_X_test)
+print(regr.score(scaled_X_test, y_test))
+print(r2_score(y_test, y_pred_test))
+print(regr.coef_)
+#print(np.shape(X_train))
+#print(np.shape(y_pred_train))
+
+'''
+for index, num in enumerate(degree):
     regr = make_pipeline(PolynomialFeatures(num), StandardScaler(), Ridge())
     regr.fit(X_train, y_train)
     y_pred_train = regr.predict(X_train)
@@ -228,6 +238,7 @@ for i in range(len(r2)):
   print('Polynomial Degree ' + str(i+1) + ' r2: ' + str(r2[i]))
 '''
 
+'''
 fig = plt.figure(figsize=(12, 4))
 ax1 = fig.add_subplot(131, projection='3d')
 ax2 = fig.add_subplot(132, projection='3d')
@@ -236,6 +247,7 @@ axes = [ax1, ax2, ax3]
 for ax in axes:
     ax.plot(avgTemp, precipt, total, marker = 'o', linestyle='none')
     ax.plot(X_train[:,0], X_train[:,1], y_pred_train)
+'''
 
 plt.show()
 
