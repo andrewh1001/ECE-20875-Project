@@ -13,6 +13,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_validate
+from yellowbrick.regressor import ResidualsPlot
 
 def PolyCoefficients(x, coeffs):
     o = len(coeffs)
@@ -158,6 +159,10 @@ plt.tight_layout()
 
 plt.show()
 '''
+
+#r = np.corrcoef(precipt, total)
+#print(r)
+
 '''
 X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = 0)
 regr = linear_model.LinearRegression()
@@ -215,6 +220,12 @@ print(np.shape(y_train))
 scaled_X_train = StandardScaler().fit_transform(X_train)
 scaled_X_test = StandardScaler().fit_transform(X_test)
 regr = Ridge(alpha = 0.5)
+
+visualizer = ResidualsPlot(regr, hist=False, qqplot=True)
+visualizer.fit(X_train, y_train)
+visualizer.score(X_test, y_test)
+visualizer.show()
+
 regr.fit(scaled_X_train, y_train)
 y_pred_test = regr.predict(scaled_X_test)
 print(regr.score(scaled_X_test, y_test))
