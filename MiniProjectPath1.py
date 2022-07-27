@@ -1,27 +1,15 @@
-from audioop import avg
-from matplotlib import gridspec
 import pandas
 import matplotlib.pyplot as plt
 from datetime import datetime 
 from matplotlib.dates import AutoDateLocator, AutoDateFormatter
 import numpy as np
-from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_validate
 from yellowbrick.regressor import ResidualsPlot
-
-def PolyCoefficients(x, coeffs):
-    o = len(coeffs)
-    print(f'# This is a polynomial of order {o}.')
-    y = 0
-    for i in range(o):
-        y += coeffs[i]*x**i
-    return y
+from sklearn.linear_model import RidgeCV
+from sklearn.linear_model import LogisticRegression
 
 ''' 
 The following is the starting code for path1 for data reading to make your first step easier.
@@ -38,6 +26,7 @@ dataset_1['Williamsburg Bridge']  = pandas.to_numeric(dataset_1['Williamsburg Br
 
 date = dataset_1["Date"] + '-2016'
 date = pandas.to_datetime(date)
+day = dataset_1['Day']
 highTemp = dataset_1['High Temp']
 lowTemp = dataset_1['Low Temp']
 precipt = dataset_1['Precipitation']
@@ -51,7 +40,7 @@ independent = dataset_1[['High Temp', 'Low Temp', 'Precipitation']]
 independentAvg = [avgTemp, precipt]
 independentAvg = np.array(independentAvg).T
 #print(np.shape(independentAvg))
-'''
+
 plt.figure(1)
 grid = plt.GridSpec(2,2)
 
@@ -158,107 +147,84 @@ plt.suptitle('New York City Bridges Bike Usage', fontsize  = 'xx-large')
 plt.tight_layout()
 
 plt.show()
-'''
 
-#r = np.corrcoef(precipt, total)
-#print(r)
+#Question 1
+print(f"Williamsburg Bridge Total Traffic: {sum(williamsBrd)} Standard Deviation: {np.std(williamsBrd)} Mean: {np.mean(williamsBrd)}")
+print(f"Queensboro Bridge Total Traffic: {sum(queenBrd)} Standard Deviation: {np.std(queenBrd)} Mean: {np.mean(queenBrd)}")
+print(f"Manhattan Bridge Total Traffic: {sum(manBrd)} Standard Deviation: {np.std(manBrd)} Mean: {np.mean(manBrd)}")
+print(f"Brooklyn Bridge Total Traffic: {sum(brookBrd)} Standard Deviation: {np.std(brookBrd)} Mean: {np.mean(brookBrd)}")
 
-'''
-X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = 0)
-regr = linear_model.LinearRegression()
-regr.fit(X_train, y_train)
-y_pred_train = regr.predict(X_train)
-y_pred_test = regr.predict(X_test)
-intercept = regr.intercept_
-coefficient = regr.coef_
-score = regr.score(X_test, y_test)
-MSE_train = mean_squared_error(y_train, y_pred_train)
-MSE_test = mean_squared_error(y_test, y_pred_test)
-r2_train = r2_score(y_train, y_pred_train)
-
-print(r2_train)
-print('Score: ', score)
-print('Accuracy: ' + str(score*100) + '%')
-
-#normalize data
-X_train_mean = np.mean(X_train, axis = 0)
-X_train_std = np.std(X_train, axis = 0)
-y_mean = np.mean(total)
-y_std = np.std(total)
-X_train_normalize = (X_train - X_train_mean) / X_train_std
-y_normalize = (y_train - y_mean) / y_std
-regr.fit(X_train_normalize, y_normalize)
-
-X_test_normalize = (X_test - X_train_mean) / X_train_std
-y_test_normalize = (y_test - y_mean) / y_std
-
-y_pred_train = regr.predict(X_train_normalize)
-y_pred_test = regr.predict(X_test_normalize)
-intercept = regr.intercept_
-coefficient = regr.coef_
-score = regr.score(X_test_normalize, y_test_normalize)
-MSE_train = mean_squared_error(y_normalize, y_pred_train)
-MSE_test = mean_squared_error(y_test_normalize, y_pred_test)
-r2_train = r2_score(y_normalize, y_pred_train)
-
-print(r2_train)
-print('Score: ', score)
-print('Accuracy: ' + str(score*100) + '%')
-'''
-
-X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.1, random_state = None)
-
-'''
-r2 = []
-colors = ['gold', 'yellow', 'red', 'blue', 'purple', 'pink', 'black', 'orange']
-degree = [1,2,3,4,5,6,7,8]
-print(np.shape(X_train))
-print(np.shape(y_train))
-'''
+bridges = ['Williamsburg', 'Queensboro', 'Manhattan', 'Brooklyn']
+bridges_mean = [np.mean(williamsBrd), np.mean(queenBrd), np.mean(manBrd), np.mean(brookBrd)]
+bridges_std = [np.std(williamsBrd), np.std(queenBrd), np.std(manBrd), np.std(brookBrd)]
+plt.figure(3)
+x_axis = np.arange(len(bridges))
+plt.bar(x_axis, bridges_mean, width = 0.25, label = 'Mean')
+plt.bar(x_axis + 0.25, bridges_std, width = 0.25, label = "STD")
+plt.xticks(x_axis, bridges)
+plt.xlabel('Bridges')
+plt.ylabel('Number of Cyclists')
+plt.title("Mean and STD Traffic for New York Bridges")
+plt.legend()
+plt.grid(False)
+plt.show()
+#Question 2
+X_train, X_test, y_train, y_test = train_test_split(independent, total, test_size = 0.25, random_state = 80)
 
 #regr = make_pipeline(PolynomialFeatures(8), StandardScaler(), Ridge())
-scaled_X_train = StandardScaler().fit_transform(X_train)
-scaled_X_test = StandardScaler().fit_transform(X_test)
-regr = Ridge(alpha = 0.5)
+X_train_scaler = StandardScaler().fit(X_train)
+X_test_scaler = StandardScaler().fit(X_test)
+scaled_X_train = X_train_scaler.transform(X_train)
+scaled_X_test = X_test_scaler.transform(X_test)
 
-visualizer = ResidualsPlot(regr, hist=False, qqplot=True)
-visualizer.fit(X_train, y_train)
-visualizer.score(X_test, y_test)
-visualizer.show()
+lmbda = np.logspace(-1, 3, num = 51)
+ridge_cv = RidgeCV(alphas = lmbda, scoring = 'neg_mean_squared_error', fit_intercept= True)
+ridge_cv.fit(scaled_X_train, y_train)
+ridge_alpha = ridge_cv.alpha_
+print("alpha: " + str(ridge_alpha))
+
+regr = Ridge(alpha = ridge_alpha)
 
 regr.fit(scaled_X_train, y_train)
 y_pred_test = regr.predict(scaled_X_test)
-print(regr.score(scaled_X_test, y_test))
-print(r2_score(y_test, y_pred_test))
-print(regr.coef_)
-#print(np.shape(X_train))
-#print(np.shape(y_pred_train))
+print("r2 score: " + str(r2_score(y_test, y_pred_test)))
+print("MSE: " + str(mean_squared_error(y_test, y_pred_test)))
+#print(regr.coef_)
+
+visualizer = ResidualsPlot(regr, hist=False, qqplot = True)
+visualizer.fit(scaled_X_train, y_train)
+visualizer.score(scaled_X_test, y_test)
+visualizer.show()
+
+#Question 3
+mon_index = day.index[day == 'Monday'].tolist()
+tue_index = day.index[day == 'Tuesday'].tolist()
+wed_index = day.index[day == 'Wednesday'].tolist()
+thur_index = day.index[day == 'Thursday'].tolist()
+fri_index = day.index[day == 'Friday'].tolist()
+sat_index = day.index[day == 'Saturday'].tolist()
+sun_index = day.index[day == 'Sunday'].tolist()
+
+mon_traffic = total[mon_index]
+tue_traffic = total[tue_index]
+wed_traffic = total[wed_index]
+thur_traffic = total[thur_index]
+fri_traffic = total[fri_index]
+sat_traffic = total[sat_index]
+sun_traffic = total[sun_index]
 
 '''
-for index, num in enumerate(degree):
-    regr = make_pipeline(PolynomialFeatures(num), StandardScaler(), Ridge())
-    regr.fit(X_train, y_train)
-    y_pred_train = regr.predict(X_train)
-    y_pred_test = regr.predict(X_test)
-    MSE_train = mean_squared_error(y_train, y_pred_train)
-    MSE_test = mean_squared_error(y_test, y_pred_test)
-    r2_train = r2_score(y_train, y_pred_train)
-    r2.append(r2_train)
-
-for i in range(len(r2)):
-  print('Polynomial Degree ' + str(i+1) + ' r2: ' + str(r2[i]))
+print(np.mean(mon_traffic))
+print(np.mean(tue_traffic))
+print(np.mean(wed_traffic))
+print(np.mean(thur_traffic))
+print(np.mean(fri_traffic))
+print(np.mean(sat_traffic))
+print(np.mean(sun_traffic))
 '''
 
-'''
-fig = plt.figure(figsize=(12, 4))
-ax1 = fig.add_subplot(131, projection='3d')
-ax2 = fig.add_subplot(132, projection='3d')
-ax3 = fig.add_subplot(133, projection='3d')
-axes = [ax1, ax2, ax3]
-for ax in axes:
-    ax.plot(avgTemp, precipt, total, marker = 'o', linestyle='none')
-    ax.plot(X_train[:,0], X_train[:,1], y_pred_train)
-'''
-
-plt.show()
-
+total = total.to_numpy()
+X_train, X_test, y_train, y_test = train_test_split(total, day, test_size = 0.25, random_state = 80)
+logReg = LogisticRegression(penalty = 'none')
+logReg.fit(X_train.reshape(-1, 1), y_train)
+print(logReg.score(X_test.reshape(-1, 1), y_test))
